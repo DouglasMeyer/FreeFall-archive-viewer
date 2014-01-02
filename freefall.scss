@@ -1,0 +1,22 @@
+@import './grid';
+
+* {
+  margin: 0; padding: 0; box-sizing: border-box;
+}
+
+html, body {
+  height: 100%; width: 100%;
+}
+
+body {
+  position: relative;
+  background-color: #FFCC99;
+}
+
+.navigation {
+  @include column(1/10);
+}
+.comics {
+  @include column(9/10);
+  margin-right: 0;
+}
