@@ -20,3 +20,22 @@ body {
   @include column(9/10);
   margin-right: 0;
 }
+[f-comic] {
+  text-align: center;
+
+  & > ul > li {
+    display: inline-block;
+    margin: 0 1em;
+    cursor: pointer;
+  }
+
+  & > .data-values {
+    text-align: left;
+
+    [for="comic_id"], [for="comic_appearances"] { @include column(1/9); }
+  }
+
+  & > pre {
+    text-align: left;
+  }
+}

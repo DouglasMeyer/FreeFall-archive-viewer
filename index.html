@@ -1,13 +1,41 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>FreeFall Archive Viewer</title>
+  <head>
+    <title>FreeFall Archive Viewer</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
-  <script>window.angular || document.write('<script src="bower_components/angular/angular.js"><\/script>')</script>
-</head>
-<body>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="freefall.css" media="screen" rel="stylesheet" type="text/css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
+    <script>window.angular || document.write('<script src="bower_components/angular/angular.js"><\/script>')</script>
+    <script src="freefall.js"></script>
+  </head>
+  <body ng-app="freefall" ng-controller="NewDataCtrl" f-file-uploader="processNewData(name, text)">
 
-</body>
+    <div class="navigation">
+      FreeFall Archive Viewer
+      <a href=""></a>
+    </div><div class="comics">
+      <div f-comic />
+    </div>
+
+    <script type="text/ng-template" id="template/comic.html">
+      <img src="{{comic.url}}" />
+      <ul class="">
+        <li ng-click="showData(false)">index values</li>
+        <li ng-click="showData(true)">index data</li>
+      </ul>
+      <div class="data-values" ng-if="!doShowData">
+        <label for="comic_id">
+          Id:
+          <input id="comic_id" type="text" model="comic.id" />
+        </label>
+        <label for="comic_appearances">
+          Appearances:
+          <input id="comic_appearances" />
+          <div ng-repeat="appearance in comic.appearances">{{appearance}}</div>
+        </label>
+      </div>
+      <pre ng-if="doShowData">{{comic.data}}</pre>
+    </script>
+  </body>
 </html>
