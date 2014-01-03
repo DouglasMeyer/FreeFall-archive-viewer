@@ -9,11 +9,11 @@
     <script>window.angular || document.write('<script src="bower_components/angular/angular.js"><\/script>')</script>
     <script src="freefall.js"></script>
   </head>
-  <body ng-app="freefall" ng-controller="NewDataCtrl" f-file-uploader="processNewData(name, text)">
+  <body ng-app="freefall" ng-controller="AppCtrl" f-file-uploader="processNewData(name, text)">
 
     <div class="navigation">
-      FreeFall Archive Viewer
-      <a href=""></a>
+      <a href="#">FreeFall Archive Viewer</a>
+      <a href="#/changes" ng-if="hasCustomData()">Changes</a>
     </div><div class="comics">
       <div f-comic />
     </div>

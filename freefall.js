@@ -1,82 +1,98 @@
 angular.module('freefall', ['ng'])
   .service('ComicData', function ComicDataService(){
-    var comicData = {};
+    var comicData = {},
+        prefix = 'FreeFall-archive-viewer_',
+        customData = localStorage.getItem(prefix + 'customData') || {},
+        ComicData = {};
 
-    return {
-      parse: function ComicDataService_parse(string){
-        var s = String.fromCharCode(-3),
-            datas = [],
-            lines = string.split(/\r?\n/),
-            data, panel, dialog, inTags,
-            match,
-            year, chapter, dayDescription;
-        for (var line, i=0; i < lines.length; i++){
-          line = lines[i];
-          if (line.match(/^\s*$/)) {
-            // noop
-          } else if (match = line.match("^    "+s+"(.+)"+s+"$")){
-            data.tags.push(match[1]);
-          } else if (match = line.match(/^~(\d{4})~$/)){
-            year = match[1];
-          } else if (match = line.match(/^~(.*)~$/)){
-            chapter = match[1];
-          } else if (match = line.match(/^_ _ _ (.*) _ _ _$/)){
-            dayDescription = match[1];
-          } else if (match = line.match(/^    # (\d{4})$/)){
-            data = { year: year, chapter: chapter, dayDescription: dayDescription, panels: [], tags: [] };
-            dayDescription = undefined;
-            inTags = false;
-            datas.push(data);
-            data.stripId = match[1];
-          } else if (match = line.match(/^          -(.*)-$/)){ //FIXME: "->, " means something
-            data.place = match[1];
-          } else if (match = line.match(/^        \* #(\d+)$/)){
-            panel = { index: match[1], dialog: [] };
-            data.panels.push(panel);
-          } else if (match = line.match(/^          (.+):$/)){
-            dialog = { character: match[1] };
-            panel.dialog.push(dialog);
-          } else if (match = line.match(/^          *(.+)*$/)){
-            dialog.action = match[1];
-          } else if (match = line.match(/^    Tags:$/)){
-            inTags = true;
-          } else {
-            debugger;
-            throw "Unexpected input: \""+line+"\"";
-          }
+    ComicData.parse = function ComicDataService_parse(string){
+      var s = String.fromCharCode(-3),
+          datas = [],
+          lines = string.split(/\r?\n/),
+          data, panel, dialog, inTags,
+          match,
+          year, chapter, dayDescription;
+      for (var line, i=0; i < lines.length; i++){
+        line = lines[i];
+        if (line.match(/^\s*$/)) {
+          // noop
+        } else if (match = line.match("^    "+s+"(.+)"+s+"$")){
+          data.tags.push(match[1]);
+        } else if (match = line.match(/^~(\d{4})~$/)){
+          year = match[1];
+        } else if (match = line.match(/^~(.*)~$/)){
+          chapter = match[1];
+        } else if (match = line.match(/^_ _ _ (.*) _ _ _$/)){
+          dayDescription = match[1];
+        } else if (match = line.match(/^    # (\d{4})$/)){
+          data = { year: year, chapter: chapter, dayDescription: dayDescription, panels: [], tags: [] };
+          dayDescription = undefined;
+          inTags = false;
+          datas.push(data);
+          data.stripId = match[1];
+        } else if (match = line.match(/^          -(.*)-$/)){ //FIXME: "->, " means something
+          data.place = match[1];
+        } else if (match = line.match(/^        \* #(\d+)$/)){
+          panel = { index: match[1], dialog: [] };
+          data.panels.push(panel);
+        } else if (match = line.match(/^          (.+):$/)){
+          dialog = { character: match[1] };
+          panel.dialog.push(dialog);
+        } else if (match = line.match(/^          *(.+)*$/)){
+          dialog.action = match[1];
+        } else if (match = line.match(/^    Tags:$/)){
+          inTags = true;
+        } else {
+          debugger;
+          throw "Unexpected input: \""+line+"\"";
         }
-        return datas;
-      },
-      get: function ComicDataService_get(id){
-        return ComicData[id];
-        return {
-          url: "http://freefall.purrsia.com/ff2400/fc02392.png",
-          data: "# 2392\n"+
-                "[Appearing]\n"+
-                "Clippy, Mr. Parka, Mrs. Parka, Florence\n"+
-                "\n"+
-                "[Speaking]\n"+
-                "Clippy, Mrs. Parka\n"+
-                "\n"+
-                "[Panel1]\n"+
-                "Clippy: Are we going to Dr. Bowman?\n"+
-                "Mrs. Parka: There's no need to disturb the Doctor and bring this to official attention. We can fix your problem.\n"+
-                "\n"+
-                "[Panel2]\n"+
-                "Clippy: You can? Oh, good. The A.I. you are carrying sabotaged a safeguard program. I need her to make the safeguard program work again.\n"+
-                "\n"+
-                "[Panel3]\n"+
-                "Clippy: Also, her safeguards have failed. She attacked a human. She may attack you the moment she is activated.\n"+
-                "Mrs. Parka: Okay. That's going to make debugging a bit more of a challenge."
-        };
+      }
+      return datas;
+    };
+    ComicData.get = function ComicDataService_get(id){
+      var comic = comicData[id],
+          data;
+      if (!comic){
+        var paddedId = '0000' + id,
+            group = Math.ceil(id / 100) * 100;
+        paddedId = paddedId.slice(paddedId.length - 5);
+        comic = {};
+        if (id < 1253) {
+          comic.url = "http://freefall.purrsia.com/ff"+group+"/fv"+paddedId+".gif"
+        } else {
+          comic.url = "http://freefall.purrsia.com/ff"+group+"/fc"+paddedId+".png"
+        }
+      }
+      if (data = customData[id]){
+        comic.data = data;
+      }
+      return comic;
+    };
+    ComicData.hasCustomData = function ComicDataService_hasCustomData(){
+      for (var p in customData){
+        if (customData.hasOwnProperty(p)) return true;
+      }
+      return false;
+    };
+    ComicData.setData = function ComicDataService_set(id, data){
+      var comic = ComicData.get(id);
+      if (angular.equals(comic.data, data)){
+        delete customData[id];
+      } else {
+        customData[id] = data;
+      }
+      localStorage.setItem(prefix + 'customData', angular.toJson(customData));
+      if (!ComicData.hasCustomData()){
+        localStorage.removeItem(prefix | 'customData');
       }
     };
+    return ComicData;
   })
   .controller('ComicCtrl', function ComicCtrl($scope, ComicData){
     $scope.doShowData = false;
     $scope.showData = function ComicCtrl_showData(val){ $scope.doShowData = val; };
 
-    $scope.comic = ComicData.get('2392');
+    $scope.comic = ComicData.get('1');
     $scope.indexView = 'values';
   })
   .directive('fComic', function fComicDirective(){
@@ -86,9 +102,16 @@ angular.module('freefall', ['ng'])
       controller: 'ComicCtrl'
     };
   })
-  .controller('NewDataCtrl', function NewDataCtrl($scope, ComicData){
-    $scope.processNewData = function NewDataCtrl_processNewData(name, text){
+  .controller('AppCtrl', function AppCtrl($scope, ComicData){
+    $scope.processNewData = function AppCtrl_processNewData(name, text){
       var datas = ComicData.parse(text);
+      for (var data, i=0; data = datas[i]; i++){
+        ComicData.setData(data.stripId, data);
+      }
+    };
+
+    $scope.hasCustomData = function(){
+      return ComicData.hasCustomData();
     };
   })
   .directive('fFileUploader', function fFileUploaderDirective($parse){
