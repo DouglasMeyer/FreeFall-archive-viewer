@@ -10,6 +10,7 @@
   "ignore": [
   ],
   "dependencies": {
-    "angular": "*"
+    "angular": "*",
+    "angular-route": "*"
   }
 }

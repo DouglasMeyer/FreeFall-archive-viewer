@@ -6,7 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href="freefall.css" media="screen" rel="stylesheet" type="text/css" />
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>
-    <script>window.angular || document.write('<script src="bower_components/angular/angular.js"><\/script>')</script>
+    <script>
+      if (!window.angular){
+        document.write('<script src="bower_components/angular/angular.js"><\/script>');
+        document.write('<script src="bower_components/angular-route/angular-route.js"><\/script>');
+      }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular-route.min.js"></script>
     <script src="freefall.js"></script>
   </head>
   <body ng-app="freefall" ng-controller="AppCtrl" f-file-uploader="processNewData(name, text)">
@@ -14,12 +20,15 @@
     <div class="navigation">
       <a href="#">FreeFall Archive Viewer</a>
       <a href="#/changes" ng-if="hasCustomData()">Changes</a>
-    </div><div class="comics">
-      <div f-comic />
-    </div>
+    </div><div class="main" ng-view />
 
+    <script type="text/ng-template" id="template/comicPage.html">
+      <div class="comic-page">
+        <a href="{{previousComic}}" ng-disabled="!previousComic">&lt;</a><div f-comic></div><a href="{{nextComic}}" ng-disabled="!nextComic">&gt;</a>
+      </div>
+    </script>
     <script type="text/ng-template" id="template/comic.html">
-      <img src="{{comic.url}}" />
+      <img ng-src="{{comic.url}}" />
       <ul class="">
         <li ng-click="showData(false)">index values</li>
         <li ng-click="showData(true)">index data</li>
@@ -35,7 +44,7 @@
           <div ng-repeat="appearance in comic.appearances">{{appearance}}</div>
         </label>
       </div>
-      <pre ng-if="doShowData">{{comic.data}}</pre>
+      <pre ng-if="doShowData">{{comic | json}}</pre>
     </script>
   </body>
 </html>
