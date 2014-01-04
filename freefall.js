@@ -10,7 +10,21 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
   var comicData = {},
       prefix = 'FreeFall-archive-viewer_',
       customData = localStorage.getItem(prefix + 'customData') || '{}',
-      ComicData = {};
+      ComicData = {},
+      createO = function(o){
+        function F(){}
+
+        F.prototype = o;
+        var c = new F();
+        c._orig = o;
+        return c;
+      },
+      anyProps = function(o){
+        for (var p in o){
+          if (p !== '_orig' && o.hasOwnProperty(p)) return true;
+        }
+        return false;
+      };
   customData = angular.fromJson(customData);
 
   ComicData.parse = function ComicDataService_parse(string){
@@ -65,27 +79,35 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
       var paddedId = '0000' + id,
           group = Math.ceil(id / 100) * 100;
       paddedId = paddedId.slice(paddedId.length - 5);
-      comicData[id] = comic = {};
+      comic = {};
       if (id < 1253) {
         comic.url = "http://freefall.purrsia.com/ff"+group+"/fv"+paddedId+".gif"
       } else {
         comic.url = "http://freefall.purrsia.com/ff"+group+"/fc"+paddedId+".png"
       }
+      comic = comicData[id] = createO(comic);
     }
     if (data = customData[id]){
-      comic.data = data;
+      angular.extend(comic, data);
     }
     return comic;
   };
   ComicData.hasCustomData = function ComicDataService_hasCustomData(){
-    for (var p in customData){
-      if (customData.hasOwnProperty(p)) return true;
-    }
-    return false;
+    return anyProps(customData);
   };
   ComicData.setData = function ComicDataService_setData(id, data){
     var comic = ComicData.get(id);
-    comic.data = customData[id] = data;
+    angular.extend(comic, data);
+    for (var prop in comic){
+      if (prop !== '_orig' && comic.hasOwnProperty(prop) && comic[prop] === comic._orig[prop]){
+        delete comic[prop];
+      }
+    }
+    if (anyProps(comic)){
+      customData[id] = data;
+    } else {
+      delete customData[id];
+    }
     localStorage.setItem(prefix + 'customData', angular.toJson(customData));
     if (!ComicData.hasCustomData()){
       localStorage.removeItem(prefix | 'customData');
