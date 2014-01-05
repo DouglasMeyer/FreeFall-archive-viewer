@@ -119,6 +119,10 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
   $scope.comic = ComicData.get(id);
   $scope.indexView = 'values';
 
+  $scope.$watch('comic', function(data){
+    ComicData.setData(id, data);
+  }, true);
+
   if (id > 1) $scope.previousComic = "#/comic/" + (id - 1);
   $scope.nextComic = "#/comic/" + (id + 1);
 })
