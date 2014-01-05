@@ -15,9 +15,7 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
         function F(){}
 
         F.prototype = o;
-        var c = new F();
-        c._orig = o;
-        return c;
+        return new F();
       },
       anyProps = function(o){
         for (var p in o){
@@ -99,12 +97,12 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
     var comic = ComicData.get(id);
     angular.extend(comic, data);
     for (var prop in comic){
-      if (prop !== '_orig' && comic.hasOwnProperty(prop) && comic[prop] === comic._orig[prop]){
+      if (comic.hasOwnProperty(prop) && comic[prop] === comic.__proto__[prop]){
         delete comic[prop];
       }
     }
     if (anyProps(comic)){
-      customData[id] = data;
+      customData[id] = comic;
     } else {
       delete customData[id];
     }
