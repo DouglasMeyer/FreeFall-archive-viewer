@@ -42,20 +42,52 @@ body {
 }
 [f-comic] {
   text-align: center;
+  font-size: 0;
+  > {
+    $comic_width: 768px;
+    .id, .chapter, .description, .panel-selector, .tag-data {
+      font-size: 1rem;
+    }
+    .id { @include column(1/7); text-align: left; }
+    .chapter { @include column(5/7); text-align: center; }
+    .description { @include column(1/7); margin-right: 0; text-align: right; }
 
-  & > ul > li {
-    display: inline-block;
-    margin: 0 1em;
-    cursor: pointer;
+    img {
+      min-width: $comic_width;
+      min-height: 242px;
+    }
+
+    .panel-selector {
+      $icon_width: 2em;
+      width: $comic_width;
+      margin: 1rem auto 0;
+      font-size: 0;
+      > * {
+        display: inline-block;
+        font-size: 1rem;
+        cursor: pointer;
+        &:first-child {
+          width: $icon_width;
+          text-align: center;
+          margin-left: -1 * $icon_width;
+        }
+        &:last-child {
+          width: $icon_width;
+          text-align: center;
+          margin-right: -1 * $icon_width;
+        }
+        &.selected {
+          border-top: 1px solid blue;
+        }
+      }
+    }
+
+    .tag-data {
+      text-align: left;
+       > * {
+         @include column(1/7);
+       }
+    }
   }
 
-  & > .data-values {
-    text-align: left;
-
-    [for="comic_id"], [for="comic_appearances"] { @include column(1/9); }
-  }
-
-  & > pre {
-    text-align: left;
-  }
 }

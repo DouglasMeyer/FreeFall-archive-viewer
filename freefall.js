@@ -116,9 +116,6 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
 .controller('ComicCtrl', function ComicCtrl($scope, $routeParams, ComicData){
   var id = parseInt($routeParams.comicId, 10);
 
-  $scope.doShowData = true;
-  $scope.showData = function ComicCtrl_showData(val){ $scope.doShowData = val; };
-
   $scope.comic = ComicData.get(id);
   $scope.indexView = 'values';
 
@@ -128,7 +125,13 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
 .directive('fComic', function fComicDirective(){
   return {
     restrict: 'A',
-    templateUrl: 'template/comic.html'
+    templateUrl: 'template/comic.html',
+    controller: function fComicDirective_Ctrl($scope){
+      $scope.selectedPanel = 0;
+      $scope.selectPanel = function fComicDirective_Ctrl_selectPanel(x){
+        $scope.selectedPanel = x;
+      };
+    }
   };
 })
 .controller('AppCtrl', function AppCtrl($scope, ComicData){
@@ -195,5 +198,14 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
       });
 
     }
+  };
+})
+.directive('fTagInput', function fTagInput($compile){
+  return function fTagInput_link(scope, element, attrs){
+    var model = attrs.fTagInput,
+        id = model.replace(/\./g, '-');
+    element.attr('for', id);
+    element.append('<input type="text" id="'+id+'" ng-model="'+model+'" />');
+    $compile(element.contents())(scope);
   };
 });

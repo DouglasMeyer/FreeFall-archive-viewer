@@ -28,23 +28,38 @@
       </div>
     </script>
     <script type="text/ng-template" id="template/comic.html">
+      <div class="id">#{{comic.stripId}}</div>
+      <div class="chapter">{{comic.chapter}}</div>
+      <div class="description">{{comic.dayDescription}}</div>
       <img ng-src="{{comic.url}}" />
-      <ul class="">
-        <li ng-click="showData(false)">index values</li>
-        <li ng-click="showData(true)">index data</li>
-      </ul>
-      <div class="data-values" ng-if="!doShowData">
-        <label for="comic_id">
-          Id:
-          <input id="comic_id" type="text" model="comic.id" />
-        </label>
-        <label for="comic_appearances">
-          Appearances:
-          <input id="comic_appearances" />
-          <div ng-repeat="appearance in comic.appearances">{{appearance}}</div>
-        </label>
+      <div class="panel-selector">
+        <div ng-class="{'selected': selectedPanel === 0}"
+             ng-click="selectPanel(0)">[]</div>
+        <div ng-repeat="panel in comic.panels"
+             ng-style="{'width': (100/comic.panels.length)+'%'}"
+             ng-class="{'selected': selectedPanel === panel.index}"
+             ng-click="selectPanel(panel.index)">panel {{panel.index}}</div>
+        <div>+</div>
       </div>
-      <pre ng-if="doShowData">{{comic | json}}</pre>
+      <div class="tag-data" ng-show="selectedPanel === 0">
+        <label f-tag-input="comic.stripId">Strip Id:</label>
+        <label f-tag-input="comic.url">URL:</label>
+        <label f-tag-input="comic.chapter">Chapter:</label>
+        <label f-tag-input="comic.dayDescription">Description:</label>
+        <label f-tag-input="comic.year">Year:</label>
+        <label f-tag-input="comic.place">Place:</label>
+        <label>Tags:</label>
+      </div>
+      <div class="tag-data" ng-repeat="panel in comic.panels" ng-show="selectedPanel === panel.index">
+        <label f-tag-input="panel.index">Panel Index:</label>
+        <div class="dialog" ng-repeat="dialog in panel.dialog">
+          <label f-tag-input="dialog.character">Character:</label>
+          <label f-tag-input="dialog.action">Action:</label>
+          <label for="dialog-text">Text:
+            <textarea id="dialog-text" ng-model="dialog.text"></textarea>
+          </label>
+        </div>
+      </div>
     </script>
   </body>
 </html>
