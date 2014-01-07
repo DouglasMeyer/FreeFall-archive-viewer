@@ -51,7 +51,7 @@
              ng-style="{'width': (100/comic.panels.length)+'%'}"
              ng-class="{'selected': selectedPanel === panel.index}"
              ng-click="selectPanel(panel.index)">panel {{panel.index}}</div>
-        <div>+</div>
+        <div ng-click="addPanel()">+</div>
       </div>
       <div class="tag-data" ng-show="selectedPanel === 0">
         <label f-tag-input="comic.stripId">Strip Id:</label>
@@ -69,7 +69,10 @@
           <label for="dialog-text">Text:
             <textarea id="dialog-text" ng-model="dialog.text"></textarea>
           </label>
+          <a ng-click="removeDialog(panel, dialog)">Remove Dialog</a>
         </div>
+        <a ng-click="addDialog(panel)">Add Dialog</a>
+        <a ng-click="removePanel(panel)">Remove Panel</a>
       </div>
     </script>
   </body>

@@ -155,7 +155,8 @@ body {
         }
         > [for="dialog-character"] { @include column(1/8); }
         > [for="dialog-action"] { @include column(1/8); }
-        > [for="dialog-text"] { @include column(6/8); margin-right: 0; }
+        > [for="dialog-text"] { @include column(5/8); }
+        > *:last-child { @include column(1/8); margin-right: 0; }
       }
     }
   }

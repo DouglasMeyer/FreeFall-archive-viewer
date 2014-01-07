@@ -135,6 +135,22 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
       $scope.selectPanel = function fComicDirective_Ctrl_selectPanel(x){
         $scope.selectedPanel = x;
       };
+      $scope.addPanel = function fComicDirective_Ctrl_addPanel(){
+        var panels = $scope.comic.panels;
+        panels.push({ index: panels.length + 1, dialog: [] });
+      };
+      $scope.removePanel = function fComicDirective_Ctrl_removePanel(panel){
+        var panels = $scope.comic.panels,
+            panelIndex = panels.indexOf(panel);
+        panels.splice(panelIndex, 1);
+      };
+      $scope.addDialog = function fComicDirective_Ctrl_addDialog(panel){
+        panel.dialog.push({});
+      };
+      $scope.removeDialog = function fComicDirective_Ctrl_removeDialog(panel, dialog){
+        var dialogIndex = panel.dialog.indexOf(dialog);
+        panel.dialog.splice(dialogIndex, 1);
+      };
     }
   };
 })
