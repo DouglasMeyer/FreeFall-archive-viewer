@@ -149,6 +149,13 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
   $scope.hasCustomData = function(){
     return ComicData.hasCustomData();
   };
+
+  $scope.chapters = [];
+  var lastChapter;
+  for (var coimc, i=1; (comic = ComicData.get(i)).stripId; i++){
+    if (lastChapter !== comic.chapter) $scope.chapters.push(comic);
+    lastChapter = comic.chapter;
+  }
 })
 .directive('fFileUploader', function fFileUploaderDirective($parse){
   return {

@@ -17,9 +17,21 @@
   </head>
   <body ng-app="freefall" ng-controller="AppCtrl" f-file-uploader="processNewData(name, text)">
 
-    <div class="navigation">
-      <a href="#">FreeFall Archive Viewer</a>
-      <a href="#/changes" ng-if="hasCustomData()">Changes</a>
+    <div class="navigation" ng-class="{'s-visible': showNavigation}">
+      <div class="changes" ng-if="hasCustomData()">
+        <h1>Changes</h1>
+        <ul>
+          <li></li>
+        </ul>
+      </div><div class="chapters">
+        <h1>Chapters</h1>
+        <ul>
+          <li ng-repeat="strip in chapters">
+            <a href="#/comic/{{strip.stripId}}">{{strip.chapter}}</a>
+          </li>
+        </ul>
+      </div>
+      <div class="toggle-navigation" ng-click="showNavigation=!showNavigation"></div>
     </div><div class="main" ng-view />
 
     <script type="text/ng-template" id="template/comicPage.html">
@@ -51,7 +63,6 @@
         <label>Tags:</label>
       </div>
       <div class="tag-data" ng-repeat="panel in comic.panels" ng-show="selectedPanel === panel.index">
-        <label f-tag-input="panel.index">Panel Index:</label>
         <div class="dialog" ng-repeat="dialog in panel.dialog">
           <label f-tag-input="dialog.character">Character:</label>
           <label f-tag-input="dialog.action">Action:</label>
