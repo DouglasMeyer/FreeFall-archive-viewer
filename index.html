@@ -43,15 +43,17 @@
       <div class="id">#{{comic.stripId}}</div>
       <div class="chapter">{{comic.chapter}}</div>
       <div class="description">{{comic.dayDescription}}</div>
-      <img ng-src="{{comic.url}}" />
-      <div class="panel-selector">
-        <div ng-class="{'selected': selectedPanel === 0}"
-             ng-click="selectPanel(0)">[]</div>
-        <div ng-repeat="panel in comic.panels"
-             ng-style="{'width': (100/comic.panels.length)+'%'}"
-             ng-class="{'selected': selectedPanel === panel.index}"
-             ng-click="selectPanel(panel.index)">panel {{panel.index}}</div>
-        <div ng-click="addPanel()">+</div>
+      <div class="comic-wrapper">
+        <img ng-src="{{comic.url}}" />
+        <div class="panel-selector">
+          <div ng-class="{'selected': selectedPanel === 0}"
+               ng-click="selectPanel(0)">[]</div>
+          <div ng-repeat="panel in comic.panels"
+               ng-style="{'width': (100/comic.panels.length)+'%'}"
+               ng-class="{'selected': selectedPanel === panel.index}"
+               ng-click="selectPanel(panel.index)">panel {{panel.index}}</div>
+          <div ng-click="addPanel()">+</div>
+        </div>
       </div>
       <div class="tag-data" ng-show="selectedPanel === 0">
         <label f-tag-input="comic.stripId">Strip Id:</label>

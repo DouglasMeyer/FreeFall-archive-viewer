@@ -77,7 +77,7 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
       var paddedId = '0000' + id,
           group = Math.ceil(id / 100) * 100;
       paddedId = paddedId.slice(paddedId.length - 5);
-      comic = {};
+      comic = { panels: [], tags: [] };
       if (id < 1253) {
         comic.url = "http://freefall.purrsia.com/ff"+group+"/fv"+paddedId+".gif"
       } else {
@@ -108,7 +108,7 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
     }
     localStorage.setItem(prefix + 'customData', angular.toJson(customData));
     if (!ComicData.hasCustomData()){
-      localStorage.removeItem(prefix | 'customData');
+      localStorage.removeItem(prefix + 'customData');
     }
   };
   return ComicData;
