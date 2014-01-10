@@ -65,14 +65,14 @@
         <label>Tags:</label>
       </div>
       <div class="tag-data" ng-repeat="panel in comic.panels" ng-show="selectedPanel === panel.index">
-        <a ng-click="removePanel(panel)">Remove Panel</a>
+        <a class="remove" ng-click="removePanel(panel)">Remove Panel</a>
         <div class="dialog" ng-repeat="dialog in panel.dialog">
           <label f-tag-input="dialog.character">Character:</label>
           <label f-tag-input="dialog.action">Action:</label>
           <label for="dialog-text">Text:
             <textarea id="dialog-text" ng-model="dialog.text"></textarea>
           </label>
-          <a ng-click="removeDialog(panel, dialog)">Remove Dialog</a>
+          <a class="remove" ng-click="removeDialog(panel, dialog)">Remove Dialog</a>
         </div>
         <a ng-click="addDialog(panel)">Add Dialog</a>
       </div>
