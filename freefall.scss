@@ -9,6 +9,11 @@ $blue-1: #80A894;
 $blue-2: #52736B;
 $blue-3: #093844;
 
+//http://clrs.cc/
+$black: #111111;
+$gray: #AAAAAA;
+$silver: #DDDDDD;
+
 * {
   margin: 0; padding: 0; box-sizing: border-box;
 }
@@ -42,7 +47,7 @@ body {
   transition: all 0.3s;
   padding: 1rem 1rem 2rem;
   background-color: $yellow;
-  border: 1px solid black;
+  border: 1px solid $black;
   border-width: 0 1px 1px 0;
 
   &.s-visible {
@@ -70,14 +75,14 @@ body {
     position: absolute;
     bottom: 0; right: 0;
     width: 2rem; height: 2rem;
-    border: 1px solid black;
+    border: 1px solid $black;
     border-width: 1px 0 0 1px;
     &:before {
       content: "";
       display: inline-block;
       margin: 0.6rem;
       width: 0.6rem; height: 0.6rem;
-      border: 1px solid black;
+      border: 1px solid $black;
       border-width: 0 1px 1px 0;
     }
   }
@@ -137,21 +142,59 @@ body {
         margin: 0 auto;
         font-size: 0;
         > * {
+          position: relative;
           display: inline-block;
+          margin-bottom: -1px;
           font-size: 1rem;
           cursor: pointer;
+
+          &:before {
+            content: "";
+            display: inline-block;
+            position: absolute;
+            width: 0; height: 0;
+            bottom: 0;
+            left: 50%;
+            left: calc(50% - 0.5rem);
+            border-style: solid;
+            border-color: red transparent $black;
+            border-width: 0 0.5rem 0.5rem;
+
+          }
+          &:hover:before {
+            border-width: 0 0.75rem 0.75rem;
+            left: calc(50% - 0.75rem);
+          }
+          &.selected {
+            &:before {
+              border-width: 0 1rem 1rem;
+              left: calc(50% - 1rem);
+            }
+            &:after {
+              content: "";
+              display: inline-block;
+              position: absolute;
+              width: 0; height: 0;
+              bottom: -1px;
+              left: 50%;
+              left: calc(50% - 1rem);
+              border-left: 1rem solid transparent;
+              border-right: 1rem solid transparent;
+              border-bottom: 1rem solid white;
+            }
+          }
+
           &:first-child {
             width: $icon_width;
             text-align: center;
             margin-left: -1 * $icon_width;
+            &:before, &:after { display: none; }
           }
           &:last-child {
             width: $icon_width;
             text-align: center;
             margin-right: -1 * $icon_width;
-          }
-          &.selected {
-            border-top: 3px solid $red;
+            &:before, &:after { display: none; }
           }
         }
       }
@@ -160,8 +203,8 @@ body {
     .tag-data {
       margin: 0 (-1 * $gutter_width);
       padding: 1rem $gutter_width;
-      background-color: #FFFFFF;
-      border: 1px solid black;
+      background-color: white;
+      border: 1px solid $black;
       text-align: left;
       font-size: 0;
 
@@ -177,9 +220,12 @@ body {
       > [for="comic-url"] { @include column(2/8); }
       > *:last-child { margin-right: 0; }
 
-      .dialog {
+      > .dialog {
         width: 100%;
         font-size: 0;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid $silver;
+        margin-bottom: 1rem;
         > * {
           font-size: 1rem;
         }
