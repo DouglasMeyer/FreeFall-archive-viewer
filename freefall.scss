@@ -49,6 +49,7 @@ body {
   background-color: $yellow;
   border: 1px solid $black;
   border-width: 0 1px 1px 0;
+  z-index: 2;
 
   &.s-visible {
     top: 0; left: 0;
@@ -147,6 +148,7 @@ body {
           margin-bottom: -1px;
           font-size: 1rem;
           cursor: pointer;
+          z-index: 1;
 
           &:before {
             content: "";
@@ -201,6 +203,7 @@ body {
     }
 
     .tag-data {
+      position: relative;
       margin: 0 (-1 * $gutter_width);
       padding: 1rem $gutter_width;
       background-color: white;
@@ -224,9 +227,19 @@ body {
       > *:last-child { margin-right: 0; }
 
       > .remove {
-        @include column(1);
-        margin-right: 0;
-        text-align: right;
+        position: absolute;
+        top: 0; right: 0;
+        text-align: center;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: bold;
+        width: 1.6em; height: 1.6em;
+        border-radius: 1.6em;
+        border: 1px solid $black;
+        margin: -0.8em;
+        line-height: 1.5;
+        background: white;
+        color: $black;
       }
 
       > .dialog {

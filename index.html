@@ -65,7 +65,7 @@
         <label>Tags:</label>
       </div>
       <div class="tag-data" ng-repeat="panel in comic.panels" ng-show="selectedPanel === panel.index">
-        <a class="remove" ng-click="removePanel(panel)">Remove Panel</a>
+        <a class="remove" ng-click="removePanel(panel)">X</a>
         <div class="dialog" ng-repeat="dialog in panel.dialog">
           <label f-tag-input="dialog.character">Character:</label>
           <label f-tag-input="dialog.action">Action:</label>
