@@ -19,9 +19,11 @@
 
     <div class="navigation" ng-class="{'s-visible': showNavigation}">
       <div class="changes" ng-if="hasCustomData()">
-        <h1>Changes</h1>
+        <h1><a href="#/changes">Changes</a></h1>
         <ul>
-          <li></li>
+          <li ng-repeat="strip in changes | orderBy:'stripId'">
+            <a href="#/comic/{{strip.stripId}}">{{strip.stripId}} - {{strip.chapter}}</a>
+          </li>
         </ul>
       </div><div class="chapters">
         <h1>Chapters</h1>
@@ -34,11 +36,52 @@
       <div class="toggle-navigation" ng-click="showNavigation=!showNavigation"></div>
     </div><div class="main" ng-view />
 
+    <script type="text/ng-template" id="template/changes.html">
+      <div class="comic-changes">
+        <div ng-hide="hasCustomData()">
+          <h2>You haven't made any changes.</h2>
+          <p>You can make changes by adding Panels and Dialog to the comic strips.</p>
+          <p>
+            Or you can drag-and-drop a file into this window. The file must match this pattern:
+          </p>
+          <pre>
+4 spaces + "#" + space + 4 digit strip number --> Expected one line command
+8 spaces + "*" + space + "#" + panel number --> Sets number of panel within the strip
+9 spaces + "SFX:" --> Next line describes a sound effect
+9 spaces + "{" + Text string + "}"  --> Description of character position within the comic panel (at the background, zoom,)
+10 spaces + TextString + ":" --> Character name that is about to talk
+10 spaces + "*" + Text string +"*" --> text string describes an action taking place
+10 spaces + "(@" + Text string +"):" --> Who they are talking TO
+10 spaces + "(" + Text string +"):" --> text string describes character action (like voice inflexion)
+10 spaces + "+" + Text String + "+" --> Description of text written somewhere
+10 spaces + "[" + Text string + "]" --> Text written at that somewhere
+4 spaces + "Tags:" --> Everything are tags until valid next strip Number command is found</pre>
+        </div>
+        <div ng-show="hasCustomData()">
+          <h2>You have some changes.</h2>
+          <p>
+            Send your changes to
+            <a href="http://www.crosstimecafe.com/memberlist.php?mode=viewprofile&u=114">cerberus</a>
+            by clicking (or dragging) the files and attaching it to an email.
+            Details about this tagging effort can be found at this
+            <a href="http://www.crosstimecafe.com/viewtopic.php?f=8&t=5067">Forum Topic</a>.
+          </p>
+          <a f-file-href="allData" download="FFsearch_all.txt">All Changes</a>
+          <ul>
+            <li ng-repeat="data in dataChunks">
+              <a f-file-href="data" download="FFsearch_{{$index + 1}}.txt">Changes {{$index * 250 + 1}} to {{($index + 1) * 250}}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </script>
+
     <script type="text/ng-template" id="template/comicPage.html">
       <div class="comic-page">
         <a href="{{previousComic}}" ng-disabled="!previousComic">&lt;</a><div f-comic></div><a href="{{nextComic}}" ng-disabled="!nextComic">&gt;</a>
       </div>
     </script>
+
     <script type="text/ng-template" id="template/comic.html">
       <div class="id">#{{comic.stripId}}</div>
       <div class="chapter">{{comic.chapter}}</div>

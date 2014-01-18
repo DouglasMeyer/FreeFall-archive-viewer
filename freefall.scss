@@ -96,6 +96,11 @@ body {
 .main {
   height: 100%;
 }
+.comic-changes {
+  margin-left: column-width(2/10, true);
+  @include column(6/10);
+  margin-top: 5rem;
+}
 .comic-page {
   height: 100%;
   & > a {

@@ -4,12 +4,16 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
     controller: 'ComicCtrl'
   });
 
+  $routeProvider.when('/changes', {
+    templateUrl: 'template/changes.html',
+    controller: 'ChangesCtrl'
+  });
+
   $routeProvider.otherwise({ redirectTo: '/comic/1' });
 })
 .service('ComicData', function ComicDataService(){
   var comicData = {},
       prefix = 'FreeFall-archive-viewer_',
-      customData = localStorage.getItem(prefix + 'customData') || '{}',
       ComicData = {},
       createO = function(o){
         function F(){}
@@ -23,8 +27,10 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
         }
         return false;
       };
-  customData = angular.fromJson(customData);
 
+  ComicData.customData = angular.fromJson(
+    localStorage.getItem(prefix + 'customData') || '{}'
+  );
   ComicData.parse = function ComicDataService_parse(string){
     var s = String.fromCharCode(-3),
         datas = [],
@@ -60,15 +66,47 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
       } else if (match = line.match(/^          (.+):$/)){
         dialog = { character: match[1], action: 'says' };
         panel.dialog.push(dialog);
-      } else if (match = line.match(/^          *(.+)*$/)){
+      } else if (match = line.match(/^          \*(.+)\*$/)){
+        dialog.action = match[1];
+      } else if (match = line.match(/^          (.+)$/)){
         dialog.text = match[1];
       } else if (match = line.match(/^    Tags:$/)){
         inTags = true;
+      } else if (inTags){
+        data.tags.push(line);
       } else {
-        throw "Unexpected input: \""+line+"\"";
+        console.log("Unexpected input: \""+line+"\"");
       }
     }
     return datas;
+  };
+  ComicData.format = function ComicDataService_format(data){
+    var output = [''],
+        id = '000' + data.stripId;
+    id = id.slice(id.length - 4);
+    output.push("");
+    output.push("");
+    output.push("");
+    output.push("");
+    output.push("    # "+id);
+    output.push("");
+    output.push("");
+    for (var i=0, panel; panel = data.panels[i]; i++){
+      output.push("");
+      output.push("        * #"+(i+1));
+      for (var j=0, dialog; dialog = panel.dialog[j]; j++){
+        output.push("          "+dialog.character+":");
+        if (dialog.action != 'says'){
+          output.push("          *"+dialog.action+"*");
+        }
+        if (dialog.text){
+          output.push("          "+dialog.text);
+        }
+      }
+    }
+    output.push("");
+    output.push("    Tags:");
+    return output.join("\r\n");
   };
   ComicData.get = function ComicDataService_get(id){
     var comic = comicData[id],
@@ -85,13 +123,13 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
       }
       comic = comicData[id] = createO(comic);
     }
-    if (data = customData[id]){
+    if (data = ComicData.customData[id]){
       angular.extend(comic, data);
     }
     return comic;
   };
   ComicData.hasCustomData = function ComicDataService_hasCustomData(){
-    return anyProps(customData);
+    return anyProps(ComicData.customData);
   };
   ComicData.setData = function ComicDataService_setData(id, data){
     var comic = ComicData.get(id);
@@ -102,16 +140,45 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
       }
     }
     if (anyProps(comic)){
-      customData[id] = comic;
+      ComicData.customData[id] = comic;
     } else {
-      delete customData[id];
+      delete ComicData.customData[id];
     }
-    localStorage.setItem(prefix + 'customData', angular.toJson(customData));
+    localStorage.setItem(prefix + 'customData', angular.toJson(ComicData.customData));
     if (!ComicData.hasCustomData()){
       localStorage.removeItem(prefix + 'customData');
     }
   };
   return ComicData;
+})
+.controller('ChangesCtrl', function ChangesCtrl($scope, ComicData){
+  $scope.allData = [];
+  $scope.dataChunks = [];
+
+  var dataChunk = [];
+  $scope.dataChunks.push(dataChunk);
+  for (var i in ComicData.customData){
+    var data = ComicData.format(ComicData.customData[i]);
+    $scope.allData.push( data );
+    if (dataChunk.length >= 250) {
+      dataChunk = [];
+      $scope.dataChunks.push(dataChunk);
+    }
+    dataChunk.push( data );
+  }
+  window.allData = $scope.allData;
+  window.dataChunks = $scope.dataChunks;
+})
+.directive('fFileHref', function fFileHrefDirective($parse){
+  return {
+    restrict: 'A',
+    link: function fFileHrefDirective_link(scope, element, attrs){
+      scope.$watch(attrs.fFileHref, function(fileData){
+        var blob = new Blob( fileData, {type: 'text/plain'});//'octet/stream'});
+        element.attr('href', URL.createObjectURL(blob));
+      });
+    }
+  };
 })
 .controller('ComicCtrl', function ComicCtrl($scope, $routeParams, ComicData){
   var id = parseInt($routeParams.comicId, 10);
@@ -172,6 +239,8 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
     if (lastChapter !== comic.chapter) $scope.chapters.push(comic);
     lastChapter = comic.chapter;
   }
+
+  $scope.changes = ComicData.customData;
 })
 .directive('fFileUploader', function fFileUploaderDirective($parse){
   return {
