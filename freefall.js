@@ -1,7 +1,14 @@
-angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
+angular.module('freefall')
+.config(function($routeProvider){
   $routeProvider.when('/comic/:comicId', {
     templateUrl: 'template/comicPage.html',
-    controller: 'ComicCtrl'
+    controller: 'ComicCtrl',
+    resolve: {
+      comic: function($route, ComicData){
+        var id = parseInt($route.current.params.comicId, 10);
+        return ComicData.get(id);
+      }
+    }
   });
 
   $routeProvider.when('/changes', {
@@ -10,149 +17,6 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
   });
 
   $routeProvider.otherwise({ redirectTo: '/comic/1' });
-})
-.service('ComicData', function ComicDataService($http){
-  var comicData = {},
-      prefix = 'FreeFall-archive-viewer_',
-      ComicData = {},
-      createO = function(o){
-        function F(){}
-
-        F.prototype = o;
-        return new F();
-      },
-      anyProps = function(o){
-        for (var p in o){
-          if (p !== '_orig' && o.hasOwnProperty(p)) return true;
-        }
-        return false;
-      };
-  $http.get('data.json').then(function(r){ comicData = r.data; });
-
-  ComicData.customData = angular.fromJson(
-    localStorage.getItem(prefix + 'customData') || '{}'
-  );
-  ComicData.parse = function ComicDataService_parse(string){
-    var s = String.fromCharCode(-3),
-        datas = [],
-        lines = string.split(/\r?\n/),
-        data, panel, dialog, inTags,
-        match,
-        year, chapter, dayDescription;
-    for (var line, i=0; i < lines.length; i++){
-      line = lines[i];
-      if (line.match(/^\s*$/)) {
-        // noop
-      } else if (match = line.match("^    "+s+"(.+)"+s+"$")){
-        data.tags.push(match[1]);
-      } else if (match = line.match(/^~(\d{4})~$/)){
-        year = match[1];
-      } else if (match = line.match(/^~(.*)~$/)){
-        chapter = match[1];
-      } else if (match = line.match(/^_ _ _ (.*) _ _ _$/)){
-        dayDescription = match[1];
-      } else if (match = line.match(/^    # (\d{4})$/)){
-        data = { year: year, chapter: chapter, dayDescription: dayDescription, panels: [], tags: [] };
-        dayDescription = undefined;
-        inTags = false;
-        datas.push(data);
-        data.stripId = parseInt(match[1], 10);
-      } else if (match = line.match(/^          -(.*)-$/)){ //FIXME: "->, " means something
-        data.place = match[1];
-      } else if (match = line.match(/^        \* #(\d+)$/)){
-        panel = { index: match[1], dialog: [] };
-        data.panels.push(panel);
-      } else if (match = line.match(/^          \((.+)\):$/)){
-        dialog.action = match[1];
-      } else if (match = line.match(/^          (.+):$/)){
-        dialog = { character: match[1], action: 'says' };
-        panel.dialog.push(dialog);
-      } else if (match = line.match(/^          \*(.+)\*$/)){
-        dialog.action = match[1];
-      } else if (match = line.match(/^          (.+)$/)){
-        dialog.text = match[1];
-      } else if (match = line.match(/^    Tags:$/)){
-        inTags = true;
-      } else if (inTags){
-        data.tags.push(line);
-      } else {
-        console.log("Unexpected input: \""+line+"\"");
-      }
-    }
-    return datas;
-  };
-  ComicData.format = function ComicDataService_format(data){
-    var output = [''],
-        id = '000' + data.stripId;
-    id = id.slice(id.length - 4);
-    output.push("");
-    output.push("");
-    output.push("");
-    output.push("");
-    output.push("    # "+id);
-    output.push("");
-    output.push("");
-    for (var i=0, panel; panel = data.panels[i]; i++){
-      output.push("");
-      output.push("        * #"+(i+1));
-      for (var j=0, dialog; dialog = panel.dialog[j]; j++){
-        output.push("          "+dialog.character+":");
-        if (dialog.action != 'says'){
-          output.push("          *"+dialog.action+"*");
-        }
-        if (dialog.text){
-          output.push("          "+dialog.text);
-        }
-      }
-    }
-    output.push("");
-    output.push("    Tags:");
-    return output.join("\r\n");
-  };
-  ComicData.get = function ComicDataService_get(id){
-    var comicProto = comicData[id],
-        comic, data;
-    if (!comicProto){
-      comicProto = comicData[id] = { panels: [], tags: [] };
-    }
-    comic = createO(comicProto);
-    if (!comic.url){
-      var paddedId = '0000' + id,
-          group = Math.ceil(id / 100) * 100,
-      paddedId = paddedId.slice(paddedId.length - 5);
-      if (id < 1253) {
-        comic.url = "http://freefall.purrsia.com/ff"+group+"/fv"+paddedId+".gif"
-      } else {
-        comic.url = "http://freefall.purrsia.com/ff"+group+"/fc"+paddedId+".png"
-      }
-    }
-    if (data = ComicData.customData[id]){
-      angular.extend(comic, data);
-    }
-    return comic;
-  };
-  ComicData.hasCustomData = function ComicDataService_hasCustomData(){
-    return anyProps(ComicData.customData);
-  };
-  ComicData.setData = function ComicDataService_setData(id, data){
-    var comic = ComicData.get(id);
-    angular.extend(comic, data);
-    for (var prop in comic){
-      if (comic.hasOwnProperty(prop) && comic[prop] === comic.__proto__[prop]){
-        delete comic[prop];
-      }
-    }
-    if (anyProps(comic)){
-      ComicData.customData[id] = comic;
-    } else {
-      delete ComicData.customData[id];
-    }
-    localStorage.setItem(prefix + 'customData', angular.toJson(ComicData.customData));
-    if (!ComicData.hasCustomData()){
-      localStorage.removeItem(prefix + 'customData');
-    }
-  };
-  return ComicData;
 })
 .controller('ChangesCtrl', function ChangesCtrl($scope, ComicData){
   $scope.allData = [];
@@ -183,18 +47,16 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
     }
   };
 })
-.controller('ComicCtrl', function ComicCtrl($scope, $routeParams, ComicData){
-  var id = parseInt($routeParams.comicId, 10);
-
-  $scope.comic = ComicData.get(id);
+.controller('ComicCtrl', function ComicCtrl($scope, $routeParams, comic, ComicData){
+  $scope.comic = comic;
   $scope.indexView = 'values';
 
   $scope.$watch('comic', function(data){
-    ComicData.setData(id, data);
+    ComicData.setData(comic.stripId, data);
   }, true);
 
-  if (id > 1) $scope.previousComic = "#/comic/" + (id - 1);
-  $scope.nextComic = "#/comic/" + (id + 1);
+  if (comic.stripId > 1) $scope.previousComic = "#/comic/" + (comic.stripId - 1);
+  $scope.nextComic = "#/comic/" + (comic.stripId + 1);
 })
 .directive('fComic', function fComicDirective(){
   return {

@@ -8,9 +8,13 @@
   "license": "MIT",
   "private": true,
   "ignore": [
+    "node_modules"
   ],
   "dependencies": {
     "angular": "*",
     "angular-route": "*"
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.2.9"
   }
 }
