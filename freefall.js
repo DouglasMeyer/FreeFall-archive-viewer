@@ -11,7 +11,7 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
 
   $routeProvider.otherwise({ redirectTo: '/comic/1' });
 })
-.service('ComicData', function ComicDataService(){
+.service('ComicData', function ComicDataService($http){
   var comicData = {},
       prefix = 'FreeFall-archive-viewer_',
       ComicData = {},
@@ -27,6 +27,7 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
         }
         return false;
       };
+  $http.get('data.json').then(function(r){ comicData = r.data; });
 
   ComicData.customData = angular.fromJson(
     localStorage.getItem(prefix + 'customData') || '{}'
@@ -109,19 +110,21 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
     return output.join("\r\n");
   };
   ComicData.get = function ComicDataService_get(id){
-    var comic = comicData[id],
-        data;
-    if (!comic){
+    var comicProto = comicData[id],
+        comic, data;
+    if (!comicProto){
+      comicProto = comicData[id] = { panels: [], tags: [] };
+    }
+    comic = createO(comicProto);
+    if (!comic.url){
       var paddedId = '0000' + id,
-          group = Math.ceil(id / 100) * 100;
+          group = Math.ceil(id / 100) * 100,
       paddedId = paddedId.slice(paddedId.length - 5);
-      comic = { panels: [], tags: [] };
       if (id < 1253) {
         comic.url = "http://freefall.purrsia.com/ff"+group+"/fv"+paddedId+".gif"
       } else {
         comic.url = "http://freefall.purrsia.com/ff"+group+"/fc"+paddedId+".png"
       }
-      comic = comicData[id] = createO(comic);
     }
     if (data = ComicData.customData[id]){
       angular.extend(comic, data);
@@ -235,7 +238,7 @@ angular.module('freefall', ['ng', 'ngRoute'], function($routeProvider){
 
   $scope.chapters = [];
   var lastChapter;
-  for (var coimc, i=1; (comic = ComicData.get(i)).stripId; i++){
+  for (var comic, i=1; (comic = ComicData.get(i)).stripId; i++){
     if (lastChapter !== comic.chapter) $scope.chapters.push(comic);
     lastChapter = comic.chapter;
   }
