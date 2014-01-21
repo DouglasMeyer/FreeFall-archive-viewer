@@ -1,8 +1,12 @@
 angular.module('freefall')
 .service('ComicData', function ComicDataService($http, $window){
   var ComicData = {},
-      theData = $http.get('data.json').then(function(r){ return r.data; }),
+      dataRequest = $http.get('data.json').then(function(r){
+        serverData = r.data;
+        return serverData;
+      }),
       prefix = 'FreeFall-archive-viewer_',
+      serverData,
       customData;
 
   customData = angular.fromJson(
@@ -10,8 +14,21 @@ angular.module('freefall')
   );
 
   ComicData.get = function ComicData_get(id){
-    return theData.then(function(data){
+    return dataRequest.then(function(data){
       return angular.extend({}, data[id], customData[id]);
+    });
+  };
+
+  ComicData.set = function ComicData_set(id, data){
+    dataRequest.then(function(){
+      var comic = angular.extend({}, customData[id], data);
+      for (var prop in comic){
+        if (comic.hasOwnProperty(prop) && comic[prop] === serverData[id]){
+          delete comic[prop];
+        }
+      }
+      customData[id] = comic;
+      $window.localStorage.setItem(prefix + 'customData', customData);
     });
   };
 
