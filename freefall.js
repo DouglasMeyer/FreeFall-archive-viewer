@@ -52,7 +52,7 @@ angular.module('freefall')
   $scope.indexView = 'values';
 
   $scope.$watch('comic', function(data){
-    ComicData.setData(comic.stripId, data);
+    ComicData.set(comic.stripId, data);
   }, true);
 
   if (comic.stripId > 1) $scope.previousComic = "#/comic/" + (comic.stripId - 1);
@@ -90,7 +90,7 @@ angular.module('freefall')
   $scope.processNewData = function AppCtrl_processNewData(name, text){
     var datas = ComicData.parse(text);
     for (var data, i=0; data = datas[i]; i++){
-      ComicData.setData(data.stripId, data);
+      ComicData.set(data.stripId, data);
     }
   };
 

@@ -12,7 +12,8 @@ describe('ComicData service', function(){
     var $window = {
       localStorage: {
         getItem: function(){ },
-        setItem: function(){ }
+        setItem: function(){ },
+        removeItem: function(){ }
       }
     }
     $provide.value('$window', $window);
@@ -74,6 +75,27 @@ describe('ComicData service', function(){
       $httpBackend.flush();
 
       expect($window.localStorage.setItem).toHaveBeenCalledWith(jasmine.any(String), expectedLocalStore);
+    }));
+
+    it('removes the comic from the localStorage if there is no difference from server', inject(function($window){
+      spyOn($window.localStorage, 'setItem')
+      var expectedLocalStore = angular.extend({}, localChanges);
+      delete expectedLocalStore[12];
+      ComicData.set(12, data[12]);
+
+      $httpBackend.flush();
+
+      expect($window.localStorage.setItem).toHaveBeenCalledWith(jasmine.any(String), expectedLocalStore);
+    }));
+
+    it('clears the localStorage if all changes are identical to server', inject(function($window){
+      spyOn($window.localStorage, 'removeItem')
+      ComicData.set(11, data[11]);
+      ComicData.set(12, data[12]);
+
+      $httpBackend.flush();
+
+      expect($window.localStorage.removeItem).toHaveBeenCalledWith(jasmine.any(String));
     }));
   });
 });

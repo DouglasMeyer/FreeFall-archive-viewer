@@ -21,14 +21,22 @@ angular.module('freefall')
 
   ComicData.set = function ComicData_set(id, data){
     dataRequest.then(function(){
-      var comic = angular.extend({}, customData[id], data);
+      var comic = angular.extend({}, data);
       for (var prop in comic){
-        if (comic.hasOwnProperty(prop) && comic[prop] === serverData[id]){
+        if (comic.hasOwnProperty(prop) && comic[prop] === serverData[id][prop]){
           delete comic[prop];
         }
       }
-      customData[id] = comic;
-      $window.localStorage.setItem(prefix + 'customData', customData);
+      if (Object.keys(comic).length === 0){
+        delete customData[id];
+      } else {
+        customData[id] = comic;
+      }
+      if (Object.keys(customData).length === 0){
+        $window.localStorage.removeItem(prefix + 'customData');
+      } else {
+        $window.localStorage.setItem(prefix + 'customData', customData);
+      }
     });
   };
 
