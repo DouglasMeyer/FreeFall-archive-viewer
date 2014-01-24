@@ -47,16 +47,18 @@ angular.module('freefall')
     }
   };
 })
-.controller('ComicCtrl', function ComicCtrl($scope, $routeParams, comic, ComicData){
+.controller('ComicCtrl', function ComicCtrl($scope, comic, ComicData){
+  var id = parseInt(comic.stripId, 10);
+
   $scope.comic = comic;
   $scope.indexView = 'values';
 
   $scope.$watch('comic', function(data){
-    ComicData.set(comic.stripId, data);
+    ComicData.set(id, data);
   }, true);
 
-  if (comic.stripId > 1) $scope.previousComic = "#/comic/" + (comic.stripId - 1);
-  $scope.nextComic = "#/comic/" + (comic.stripId + 1);
+  if (id > 1) $scope.previousComic = "#/comic/" + (id - 1);
+  $scope.nextComic = "#/comic/" + (id + 1);
 })
 .directive('fComic', function fComicDirective(){
   return {
@@ -100,10 +102,12 @@ angular.module('freefall')
 
   $scope.chapters = [];
   var lastChapter;
-  for (var comic, i=1; (comic = ComicData.get(i)).stripId; i++){
-    if (lastChapter !== comic.chapter) $scope.chapters.push(comic);
-    lastChapter = comic.chapter;
-  }
+  ComicData.all().then(function(comics){
+    for (var i in comics){
+      if (lastChapter !== comics[i].chapter) $scope.chapters.push(comics[i]);
+      lastChapter = comics[i].chapter;
+    }
+  });
 
   $scope.changes = ComicData.customData;
 })
