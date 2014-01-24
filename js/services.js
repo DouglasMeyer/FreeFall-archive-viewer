@@ -94,9 +94,6 @@ angular.module('freefall')
         dialog = { character: match[1], action: 'says' };
         panel.dialog.push(dialog);
       } else if (match = line.match(/^          \*(.+)\*$/)){
-        if (dialog.action !== 'says'){
-          console.log('Replacing action %s with %s', dialog.action, match[1]);
-        }
         dialog.action = match[1];
       } else if (match = line.match(/^          (.+)$/)){
         dialog.text = match[1];
@@ -133,7 +130,7 @@ angular.module('freefall')
       output.push("");
       output.push("");
       output.push("          -"+data.place+"-");
-      for (var i=0, panel; panel = data.panels[i]; i++){
+      for (var i=0, panel; panel = (data.panels || [])[i]; i++){
         output.push("");
         output.push("        * #"+(i+1));
         for (var j=0, dialog; dialog = panel.dialog[j]; j++){
@@ -148,7 +145,7 @@ angular.module('freefall')
       }
       output.push("");
       output.push("    Tags:");
-      for (var i=0, tag; tag = data.tags[i]; i++){
+      for (var i=0, tag; tag = (data.tags || [])[i]; i++){
         output.push(tag);
       }
       output.push("");

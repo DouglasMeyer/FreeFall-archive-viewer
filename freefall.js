@@ -19,29 +19,32 @@ angular.module('freefall')
   $routeProvider.otherwise({ redirectTo: '/comic/1' });
 })
 .controller('ChangesCtrl', function ChangesCtrl($scope, ComicData){
-  $scope.allData = [];
-  $scope.dataChunks = [];
-
-  var dataChunk = [];
-  $scope.dataChunks.push(dataChunk);
-  for (var i in ComicData.customData){
-    var data = ComicData.format(ComicData.customData[i]);
-    $scope.allData.push( data );
-    if (dataChunk.length >= 250) {
-      dataChunk = [];
-      $scope.dataChunks.push(dataChunk);
-    }
-    dataChunk.push( data );
+  var dataKeys = Object.keys(ComicData.customData),
+      dataCount = dataKeys.length,
+      groupCount = parseInt((dataCount - 1) / 250 + 1, 10);
+  $scope.dataRanges = [ { name: 'All Changes', file: 'all', start: 1, end: dataCount } ];
+  for (var i=0; i < groupCount; i++){
+    var start = i * 250 + 1,
+        end = (i + 1) * 250;
+    $scope.dataRanges.push({
+      name: 'Changes '+start+' - '+end, file: end, start: start, end: end
+    });
   }
-  window.allData = $scope.allData;
-  window.dataChunks = $scope.dataChunks;
+  $scope.range = $scope.dataRanges[0];
+  $scope.$watch('range', function(range){
+    var data = [];
+    for (var i = range.start-1; i < range.end && dataKeys[i]; i++){
+      data.push(ComicData.customData[dataKeys[i]]);
+    }
+    $scope.dataForRange = ComicData.format(data);
+  });
 })
 .directive('fFileHref', function fFileHrefDirective($parse){
   return {
     restrict: 'A',
     link: function fFileHrefDirective_link(scope, element, attrs){
       scope.$watch(attrs.fFileHref, function(fileData){
-        var blob = new Blob( fileData, {type: 'text/plain'});//'octet/stream'});
+        var blob = new Blob( [ fileData ], {type: 'text/plain'});//'octet/stream'});
         element.attr('href', URL.createObjectURL(blob));
       });
     }

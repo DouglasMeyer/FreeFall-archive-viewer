@@ -290,5 +290,11 @@ describe('ComicData service', function(){
         "\r\n"+
         "\r\n");
     });
+
+    it('does not throw for incomplete data', function(){
+      expect(function(){
+        ComicData.format([{}]);
+      }).not.toThrow();
+    });
   });
 });

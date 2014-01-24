@@ -64,16 +64,12 @@
           <p>
             Send your changes to
             <a href="http://www.crosstimecafe.com/memberlist.php?mode=viewprofile&u=114">cerberus</a>
-            by clicking (or dragging) the files and attaching it to an email.
+            by selecting what data you want, then click (or drag) the files and attach it to an email.
             Details about this tagging effort can be found at this
             <a href="http://www.crosstimecafe.com/viewtopic.php?f=8&t=5067">Forum Topic</a>.
           </p>
-          <a f-file-href="allData" download="FFsearch_all.txt">All Changes</a>
-          <ul>
-            <li ng-repeat="data in dataChunks">
-              <a f-file-href="data" download="FFsearch_{{$index + 1}}.txt">Changes {{$index * 250 + 1}} to {{($index + 1) * 250}}</a>
-            </li>
-          </ul>
+          <select ng-model="range" ng-options="range.name for range in dataRanges"></select>
+          <a f-file-href="dataForRange" download="FFsearch_{{range.file}}.txt" ng-bind="range.name"></a>
         </div>
       </div>
     </script>
