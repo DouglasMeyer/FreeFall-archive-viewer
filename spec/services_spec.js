@@ -1,6 +1,6 @@
 describe('ComicData service', function(){
   var data = {
-        11: { stripId: 11 },
+        11: { stripId: 11, panels: [] },
         12: { stripId: 12 }
       },
       $window, $httpBackend, ComicData;
@@ -21,7 +21,8 @@ describe('ComicData service', function(){
 
     $httpBackend.when('GET', 'data.json').respond(data);
     spyOn($window.localStorage, 'getItem').andReturn(angular.toJson({
-      11: { something: 'something' }
+      11: { something: 'something' },
+      14: { something: 'something' }
     }));
     ComicData = $injector.get('ComicData');
   }));
@@ -46,6 +47,42 @@ describe('ComicData service', function(){
       var promiseResolved = false;
       ComicData.get(11).then(function(comic){
         expect(comic.something).toEqual('something');
+        promiseResolved = true;
+      });
+      $httpBackend.flush();
+      expect(promiseResolved).toBe(true);
+    });
+
+    it('resolves to a copy that can be safely modified', function(){
+      var promiseResolved = false;
+      ComicData.get(11).then(function(comic1){
+        comic1.panels = [ { index: 1 } ];
+
+        ComicData.get(11).then(function(comic2){
+          promiseResolved = true;
+
+          expect(comic2.panels.length).toBe(0);
+        });
+      });
+      $httpBackend.flush();
+      expect(promiseResolved).toBe(true);
+    });
+
+    it('resolves to a copy from localStorage, if there is no server data', function(){
+      var promiseResolved = false;
+      ComicData.get(14).then(function(){
+        promiseResolved = true;
+      });
+      expect(function(){
+        $httpBackend.flush();
+      }).not.toThrow();
+      expect(promiseResolved).toBe(true);
+    });
+
+    it('resolves to undefined, if comic is not found', function(){
+      var promiseResolved = false;
+      ComicData.get(13).then(function(comic){
+        expect(comic).toBeUndefined();
         promiseResolved = true;
       });
       $httpBackend.flush();
@@ -110,6 +147,7 @@ describe('ComicData service', function(){
       spyOn($window.localStorage, 'removeItem')
       ComicData.set(11, data[11]);
       ComicData.set(12, data[12]);
+      ComicData.set(14, data[14]);
 
       $httpBackend.flush();
 
@@ -121,6 +159,7 @@ describe('ComicData service', function(){
     expect(ComicData.hasCustomData()).toBe(true);
 
     ComicData.set(11, data[11]);
+    ComicData.set(14, data[14]);
     $httpBackend.flush();
 
     expect(ComicData.hasCustomData()).toBe(false);

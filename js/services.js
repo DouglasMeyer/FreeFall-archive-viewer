@@ -19,7 +19,12 @@ angular.module('freefall')
 
   ComicData.get = function ComicData_get(id){
     return dataRequest.then(function(data){
-      return angular.extend({}, data[id], customData[id]);
+      var serverComic = data[id],
+          customComic = customData[id];
+      if (!serverComic && !customComic) return;
+      var comic = angular.copy(serverComic || {});
+      angular.extend(comic, customComic);
+      return comic;
     });
   };
 
@@ -37,7 +42,7 @@ angular.module('freefall')
     dataRequest.then(function(){
       var comic = angular.extend({}, data);
       for (var prop in comic){
-        if (comic.hasOwnProperty(prop) && comic[prop] === serverData[id][prop]){
+        if (comic.hasOwnProperty(prop) && angular.equals(comic[prop], (serverData[id] || {})[prop])){
           delete comic[prop];
         }
       }

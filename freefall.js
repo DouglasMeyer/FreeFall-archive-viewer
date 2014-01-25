@@ -50,14 +50,35 @@ angular.module('freefall')
     }
   };
 })
-.controller('ComicCtrl', function ComicCtrl($scope, comic, ComicData){
-  var id = parseInt(comic.stripId, 10);
+.controller('ComicCtrl', function ComicCtrl($scope, comic, ComicData, $routeParams){
+  var id;
+  if (comic){
+    id = parseInt(comic.stripId, 10);
+  } else {
+    id = parseInt($routeParams.comicId, 10);
+    comic = {
+      stripId: ''+id,
+      panels: []
+    };
+    var paddedId = '0000' + id,
+        group = Math.ceil(id / 100) * 100,
+    paddedId = paddedId.slice(paddedId.length - 5);
+    if (id < 1253) {
+      comic.url = "http://freefall.purrsia.com/ff"+group+"/fv"+paddedId+".gif"
+    } else {
+      comic.url = "http://freefall.purrsia.com/ff"+group+"/fc"+paddedId+".png"
+    }
+    ComicData.get(id-1).then(function(previousComic){
+      comic.chapter = previousComic.chapter;
+      comic.year    = previousComic.year;
+    });
+  }
 
   $scope.comic = comic;
   $scope.indexView = 'values';
 
-  $scope.$watch('comic', function(data){
-    ComicData.set(id, data);
+  $scope.$watch('comic', function(comic){
+    ComicData.set(id, comic);
   }, true);
 
   if (id > 1) $scope.previousComic = "#/comic/" + (id - 1);
