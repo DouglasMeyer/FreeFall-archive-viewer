@@ -1,26 +1,25 @@
-$gutter_width: 2.5rem;
+gutter_width = 2.5rem unless gutter_width
 
 
 // column-width($fraction, $include-gutter) function returns the calculated
 // length value for columns.
 // `$fraction` is typically represented as `2/10` for 2 of 10 columns.
 // `$include-gutter` will include the gutter width in the return value.
-@function column-width($fraction: 1/10, $include-gutter: false) {
-  @return calc(
-    (100% + #{$gutter_width}) * #{$fraction}
-    - #{if($include-gutter, 0px, $gutter_width)}
-  );
+column-width(fraction = 1/10, include-gutter = false) {
+  and-gutter = 0px;
+  and-gutter = gutter_width unless include-gutter;
+  "calc( (100% + %s) * %s - %s)" % ( gutter_width fraction and-gutter );
 }
 
 // column($fraction) mixin will apply column widths and gutter to a selector.
 // `$fraction` is typically represented as `2/10` for 2 of 10 columns.
-@mixin column($fraction: 1/10) {
+column(fraction = 1/10) {
   //TODO: `last` option to not apply gutter.
-  margin-right: $gutter_width;
+  margin-right: gutter_width;
 
   display: inline-block;
   vertical-align: top;
-  width: column-width($fraction);
+  width: column-width(fraction);
 }
 
 
@@ -36,7 +35,7 @@ $gutter_width: 2.5rem;
   white-space: nowrap;
 
   & > * {
-    @include column;
+    column();
     height: 100%;
     border-style: dashed;
     border-color: rgba(255, 0, 0, 0.4);

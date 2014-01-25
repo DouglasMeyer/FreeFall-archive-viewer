@@ -1,27 +1,29 @@
-@import './grid';
+gutter_width = 2.5rem;
 
-$freefall_orange: #FFCC99;
+@import 'grid';
+
+freefall_orange = #FFCC99;
 
 // https://kuler.adobe.com/Copy-of-Bookstore-color-theme-3309517/
-$red: #D94214;
-$yellow: #FFF2C1;
-$blue-1: #80A894;
-$blue-2: #52736B;
-$blue-3: #093844;
+red = #D94214;
+yellow = #FFF2C1;
+blue-1 = #80A894;
+blue-2 = #52736B;
+blue-3 = #093844;
 
 //http://clrs.cc/
-$black: #111111;
-$gray: #AAAAAA;
-$silver: #DDDDDD;
+black = #111111;
+gray = #AAAAAA;
+silver = #DDDDDD;
 
 * {
   margin: 0; padding: 0; box-sizing: border-box;
 }
 
 a {
-  color: $blue-2;
+  color: blue-2;
   &:visited {
-    color: $blue-3;
+    color: blue-3;
   }
 }
 
@@ -35,7 +37,7 @@ html {
 }
 body {
   position: relative;
-  background-color: $yellow;
+  background-color: yellow;
 }
 
 .navigation {
@@ -46,8 +48,8 @@ body {
   left: calc(-40em + 2rem + 1px);
   transition: all 0.3s;
   padding: 1rem 1rem 2rem;
-  background-color: $yellow;
-  border: 1px solid $black;
+  background-color: yellow;
+  border: 1px solid black;
   border-width: 0 1px 1px 0;
   z-index: 2;
 
@@ -56,7 +58,7 @@ body {
   }
 
   > .changes, > .chapters {
-    @include column(1/2);
+    column(1/2);
     position: relative;
     height: 100%;
 
@@ -78,14 +80,14 @@ body {
     position: absolute;
     bottom: 0; right: 0;
     width: 2rem; height: 2rem;
-    border: 1px solid $black;
+    border: 1px solid black;
     border-width: 1px 0 0 1px;
     &:before {
       content: "";
       display: inline-block;
       margin: 0.6rem;
       width: 0.6rem; height: 0.6rem;
-      border: 1px solid $black;
+      border: 1px solid black;
       border-width: 0 1px 1px 0;
     }
   }
@@ -100,13 +102,13 @@ body {
 }
 .comic-changes {
   margin-left: column-width(2/10, true);
-  @include column(6/10);
+  column(6/10);
   margin-top: 5rem;
 }
 .comic-page {
   height: 100%;
   & > a {
-    @include column(1/10);
+    column(1/10);
     font-size: 3em;
     text-align: center;
     text-decoration: none;
@@ -120,7 +122,7 @@ body {
     }
   }
   & > [f-comic] {
-    @include column(8/10);
+    column(8/10);
     margin-top: 2rem;
   }
   & > a:last-child { margin-right: 0; }
@@ -133,9 +135,9 @@ body {
     .id, .chapter, .description, .panel-selector, .tag-data {
       font-size: 1rem;
     }
-    .id { @include column(1/8); text-align: left; }
-    .chapter { @include column(6/8); text-align: center; }
-    .description { @include column(1/8); margin-right: 0; text-align: right; }
+    .id { column(1/8); text-align: left; }
+    .chapter { column(6/8); text-align: center; }
+    .description { column(1/8); margin-right: 0; text-align: right; }
 
     .comic-wrapper {
       display: inline-block;
@@ -146,7 +148,7 @@ body {
       }
 
       > .panel-selector {
-        $icon_width: 2em;
+        icon_width = 2em;
         margin: 0 auto;
         font-size: 0;
         > * {
@@ -166,7 +168,7 @@ body {
             left: 50%;
             left: calc(50% - 0.5rem);
             border-style: solid;
-            border-color: red transparent $black;
+            border-color: red transparent black;
             border-width: 0 0.5rem 0.5rem;
 
           }
@@ -194,15 +196,15 @@ body {
           }
 
           &:first-child {
-            width: $icon_width;
+            width: icon_width;
             text-align: center;
-            margin-left: -1 * $icon_width;
+            margin-left: -1 * icon_width;
             &:before, &:after { display: none; }
           }
           &:last-child {
-            width: $icon_width;
+            width: icon_width;
             text-align: center;
-            margin-right: -1 * $icon_width;
+            margin-right: -1 * icon_width;
             &:before, &:after { display: none; }
           }
         }
@@ -211,26 +213,28 @@ body {
 
     .tag-data {
       position: relative;
-      margin: 0 (-1 * $gutter_width);
-      padding: 1rem $gutter_width;
+      margin: 0 -1 * gutter_width;
+      padding: 1rem gutter_width;
       background-color: white;
-      border: 1px solid $black;
+      border: 1px solid black;
       text-align: left;
       font-size: 0;
 
       input, textarea {
         display: block;
         width: 100%;
-        border: 1px solid $black;
+        border: 1px solid black;
         margin: -2px;
         padding: 1px;
       }
 
       > * {
         font-size: 1rem;
-        @include column(1/8);
+        column(1/8);
       }
-      > [for="comic-url"] { @include column(2/8); }
+      > [for="comic-url"] {
+        column(2/8)
+      }
       > *:last-child { margin-right: 0; }
 
       > .remove {
@@ -242,11 +246,11 @@ body {
         font-weight: bold;
         width: 1.6em; height: 1.6em;
         border-radius: 1.6em;
-        border: 1px solid $black;
+        border: 1px solid black;
         margin: -0.8em;
         line-height: 1.5;
         background: white;
-        color: $black;
+        color: black;
       }
 
       > .dialog {
@@ -254,15 +258,21 @@ body {
         width: 100%;
         font-size: 0;
         padding-bottom: 1rem;
-        border-bottom: 1px solid $silver;
+        border-bottom: 1px solid silver;
         margin-bottom: 1rem;
         > * {
           font-size: 1rem;
         }
-        > [for="dialog-character"] { @include column(1/8); }
-        > [for="dialog-action"] { @include column(1/8); }
-        > [for="dialog-text"] { @include column(5/8); }
-        > *:last-child { @include column(1/8); margin-right: 0; }
+        > [for="dialog-character"] {
+          column(1/8)
+        }
+        > [for="dialog-action"] {
+          column(1/8)
+        }
+        > [for="dialog-text"] {
+          column(5/8)
+        }
+        > *:last-child { column(1/8); margin-right: 0; }
 
         > .remove {
           display: inline-block;
